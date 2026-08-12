@@ -1,0 +1,23 @@
+{
+  "name": "dictionary-gpt",
+  "version": "1.0.0",
+  "description": "轻量在线词典查询：Node.js + Express + MySQL，免费、低内存、可互联网访问",
+  "main": "server.js",
+  "type": "commonjs",
+  "scripts": {
+    "start": "node --max-old-space-size=256 server.js",
+    "seed": "node db/seed.js",
+    "import:cedict": "node scripts/import-cedict.js",
+    "test": "node --check server.js && node --check db/seed.js && node --check scripts/import-cedict.js"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "keywords": ["dictionary", "mysql", "nodejs", "express", "free"],
+  "license": "MIT",
+  "dependencies": {
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "mysql2": "^3.12.0"
+  }
+}
