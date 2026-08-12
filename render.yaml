@@ -1,0 +1,23 @@
+﻿# Render Blueprint：在 Render 控制台 New -> Blueprint 选择本仓库即可一键部署
+# 环境变量在首次部署时会提示手动填写（TiDB Cloud 的连接信息）
+services:
+  - type: web
+    name: dictionary-gpt
+    runtime: node
+    plan: free
+    buildCommand: npm install
+    startCommand: npm start
+    healthCheckPath: /health
+    envVars:
+      - key: DB_HOST
+        sync: false
+      - key: DB_PORT
+        sync: false
+      - key: DB_USER
+        sync: false
+      - key: DB_PASSWORD
+        sync: false
+      - key: DB_NAME
+        sync: false
+      - key: DB_SSL
+        sync: false
