@@ -14,6 +14,33 @@
     return div.innerHTML;
   }
 
+  function render(r) {
+    var html = '<li class="item">';
+
+    html += '<div class="word">' + esc(r.word);
+    if (r.phonetic) html += ' <span class="phonetic">/' + esc(r.phonetic) + '/</span>';
+    if (r.pinyin) html += ' <span class="pinyin">[' + esc(r.pinyin) + ']</span>';
+    if (r.pos) html += ' <span class="pos">' + esc(r.pos) + '</span>';
+    html += '</div>';
+
+    var tags = (r.tag || '').split(/\s+/).filter(Boolean);
+    if (tags.length) {
+      html += '<div class="tags">' + tags.map(function (t) {
+        return '<span class="tag">' + esc(t) + '</span>';
+      }).join('') + '</div>';
+    }
+
+    if (r.exchange) html += '<div class="exchange">词形：' + esc(r.exchange) + '</div>';
+    html += '<div class="def">' + esc(r.definition) + '</div>';
+
+    if (r.audio && /^https?:/.test(r.audio)) {
+      html += '<div class="meta"><a href="' + esc(r.audio) + '" target="_blank" rel="noopener">🔊 发音</a></div>';
+    }
+    html += '<div class="meta">来源：' + esc(r.source) + '</div>';
+    html += '</li>';
+    return html;
+  }
+
   function search() {
     var q = input.value.trim();
     if (!q) { resultsEl.innerHTML = ''; statusEl.textContent = ''; return; }
@@ -36,17 +63,7 @@
           return;
         }
         statusEl.textContent = '找到 ' + data.count + ' 条结果';
-        resultsEl.innerHTML = data.results.map(function (r) {
-          var html = '<li class="item">';
-          html += '<div class="word">' + esc(r.word);
-          if (r.traditional) html += ' <span class="trad">' + esc(r.traditional) + '</span>';
-          if (r.pinyin) html += ' <span class="pinyin">[' + esc(r.pinyin) + ']</span>';
-          html += '</div>';
-          html += '<div class="def">' + esc(r.definition) + '</div>';
-          html += '<div class="meta">来源：' + esc(r.source) + '</div>';
-          html += '</li>';
-          return html;
-        }).join('');
+        resultsEl.innerHTML = data.results.map(render).join('');
       })
       .catch(function (err) {
         statusEl.textContent = '请求失败：' + err.message;

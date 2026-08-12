@@ -5,12 +5,12 @@
 - ✅ **免费**：数据库用 TiDB Cloud Serverless（MySQL 兼容、免信用卡），部署用 Render 免费版
 - ✅ **内存小**：只依赖 3 个运行时包（express / mysql2 / dotenv），小连接池，默认堆内存上限 256MB
 - ✅ **可互联网访问**：部署到 Render / Vercel 后，任何人通过 URL 即可访问
-- ✅ **支持大数据**：内置 CC-CEDICT 导入脚本（约 12 万词条，免费）
+- ✅ **词库大**：默认内置 ECDICT 英汉词典（约 76 万词条，MIT 协议），含音标、词性、考试标签、词形变化
 
 ## 功能
 
 - 精确匹配 / 前缀匹配 / 模糊搜索
-- 返回单词、拼音、释义、数据来源
+- 显示：单词、音标（IPA）、拼音、词性、考试标签（中考/高考/四级/六级/考研/托福/雅思/GRE）、中文+英文释义、词形变化、数据来源
 - 简洁中文网页界面 + JSON API
 - 健康检查接口
 
@@ -21,11 +21,13 @@
 ├── server.js              # 主服务：Express + mysql2 连接池
 ├── public/                # 网页前端（原生 HTML/JS/CSS，无框架）
 ├── db/
-│   ├── schema.sql         # 建表语句
+│   ├── schema.sql         # 建表语句（支持 CEDICT + ECDICT 字段）
 │   ├── sample.csv         # 示例词条
-│   └── seed.js            # CSV 导入脚本
+│   └── seed.js            # 示例 CSV 导入脚本
 ├── scripts/
-│   └── import-cedict.js   # 导入 CC-CEDICT 大词库
+│   ├── import-cedict.js   # 导入 CC-CEDICT（约 12 万词条，拼音）
+│   └── import-ecdict.js   # 导入 ECDICT（约 76 万词条，音标/词性/标签）
+├── data/                  # 词库文件（git 已忽略，不提交）
 ├── .env.example           # 环境变量模板
 ├── .github/workflows/     # CI：语法检查
 └── README.md
@@ -57,20 +59,34 @@ DB_NAME=dictionary
 DB_SSL=true
 ```
 
-### 3. 安装依赖并导入示例数据
+### 3. 安装依赖
 
 ```bash
 npm install
-npm run seed
 ```
 
-导入完整 CEDICT 词库（约 12 万条，可选，需要联网）：
+### 4. 导入词库（二选一）
+
+导入 ECDICT 完整词库（约 76 万词条，**推荐**，文件约 63MB）：
+
+```bash
+# 先下载 https://github.com/skywind3000/ECDICT 的 ecdict.csv 到 data/ 目录
+node scripts/import-ecdict.js data/ecdict.csv --reset
+```
+
+或导入 CC-CEDICT（约 12 万词条，脚本自动下载，约 9MB）：
 
 ```bash
 npm run import:cedict -- --reset
 ```
 
-### 4. 启动
+或先导入内置示例数据（10 条）：
+
+```bash
+npm run seed
+```
+
+### 5. 启动
 
 ```bash
 npm start
@@ -85,17 +101,30 @@ npm start
 | GET /health | 健康检查 |
 | GET /api/search?q=hello | 查询（默认前缀匹配） |
 | GET /api/search?q=hello&mode=exact | 精确匹配 |
-| GET /api/search?q=run&mode=fuzzy | 模糊搜索（单词/拼音/释义） |
+| GET /api/search?q=run&mode=fuzzy | 模糊搜索（单词/音标/释义） |
 
 返回示例：
 
 ```json
 {
   "query": "hello",
-  "mode": "prefix",
+  "mode": "exact",
   "count": 1,
   "results": [
-    { "id": 2, "word": "hello", "traditional": "", "pinyin": "nǐ hǎo", "definition": "你好；喂；哈喽", "source": "CEDICT" }
+    {
+      "id": 445216,
+      "word": "hello",
+      "traditional": "",
+      "pinyin": "",
+      "phonetic": "həˈləʊ",
+      "definition": "int. 你好；喂
+n. 表示问候",
+      "pos": "int/n",
+      "tag": "zk gk",
+      "exchange": "s:hellos",
+      "audio": "",
+      "source": "ECDICT"
+    }
   ]
 }
 ```
@@ -129,7 +158,10 @@ npm start
    - Create Cluster → 选择 Serverless（免费）→ 创建
    - 在 Overview 点 Connect，记录连接串，格式：`mysql://用户:密码@主机:4000/dictionary`
    - 在 SQL Editor 执行 `db/schema.sql` 建表
-   - 本机运行 `npm run import:cedict` 把词库导入云端数据库（或本地导入）
+   - 把词库导入云端数据库（本机执行，连接的是云端地址）：
+     ```bash
+     node scripts/import-ecdict.js data/ecdict.csv --reset
+     ```
 
 3. **在 Render 部署**
 
@@ -158,7 +190,13 @@ npm start
 - 依赖极少：只有 `express`、`mysql2`、`dotenv` 三个运行时依赖，不用 ORM
 - `mysql2` 使用连接池，`DB_POOL_SIZE` 默认 5，够用且省内存
 - `npm start` 使用 `--max-old-space-size=256` 限制堆内存
+- 导入 ECDICT 采用流式逐行读取 + 批量插入，内存占用稳定
 - 大词库查询建议用 exact / prefix（走索引），fuzzy 会全表扫描，较慢
+
+## 数据来源与许可
+
+- ECDICT：https://github.com/skywind3000/ECDICT （MIT 协议，约 76 万词条）
+- CC-CEDICT：https://www.mdbg.net/chinese/dictionary?page=cc-cedict （CC BY-SA 4.0，约 12 万词条）
 
 ## 常见问题
 
@@ -166,8 +204,4 @@ npm start
 - **TiDB Cloud 连接报错**：Serverless 要求 TLS，必须 `DB_SSL=true`
 - **fuzzy 搜索慢**：词库很大时模糊搜索会全表扫描，属正常现象，建议用前缀匹配
 - **Render 免费版休眠**：个人使用完全够用，也可用 UptimeRobot 定时 ping 保持唤醒（注意免费额度 750 小时/月）
-
-## 数据来源与许可
-
-- 示例数据为本项目自带
-- CC-CEDICT 由 MDBG 提供，遵循 CC BY-SA 4.0：https://www.mdbg.net/chinese/dictionary?page=cc-cedict
+- **ECDICT 下载慢/失败**：国内可用加速镜像，如 `https://ghfast.top/https://raw.githubusercontent.com/skywind3000/ECDICT/master/ecdict.csv`（支持断点续传）

@@ -70,10 +70,27 @@ h1 { font-size: 28px; text-align: center; }
 }
 
 .word { font-size: 18px; font-weight: 600; color: #111827; }
+.phonetic { color: #7c3aed; font-weight: 400; margin-left: 4px; }
 .trad { color: #6b7280; font-weight: 400; }
 .pinyin { color: #b45309; font-weight: 400; margin-left: 4px; }
-.def { margin-top: 6px; line-height: 1.6; color: #374151; font-size: 15px; }
+.pos { color: #059669; font-weight: 400; margin-left: 6px; font-size: 14px; }
+
+.tags { margin-top: 6px; }
+.tag {
+  display: inline-block;
+  background: #eff6ff;
+  color: #1d4ed8;
+  border: 1px solid #bfdbfe;
+  border-radius: 999px;
+  padding: 1px 10px;
+  font-size: 12px;
+  margin-right: 6px;
+}
+
+.exchange { margin-top: 6px; font-size: 13px; color: #6b7280; }
+.def { margin-top: 6px; line-height: 1.7; color: #374151; font-size: 15px; white-space: pre-line; }
 .meta { margin-top: 8px; font-size: 12px; color: #9ca3af; }
+.meta a { color: #2563eb; text-decoration: none; }
 
 @media (max-width: 520px) {
   .search-box { flex-wrap: wrap; }

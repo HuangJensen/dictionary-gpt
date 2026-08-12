@@ -8,12 +8,13 @@
     "start": "node --max-old-space-size=256 server.js",
     "seed": "node db/seed.js",
     "import:cedict": "node scripts/import-cedict.js",
-    "test": "node --check server.js && node --check db/seed.js && node --check scripts/import-cedict.js"
+    "import:ecdict": "node scripts/import-ecdict.js",
+    "test": "node --check server.js && node --check db/seed.js && node --check scripts/import-cedict.js && node --check scripts/import-ecdict.js"
   },
   "engines": {
     "node": ">=18"
   },
-  "keywords": ["dictionary", "mysql", "nodejs", "express", "free"],
+  "keywords": ["dictionary", "mysql", "nodejs", "express", "free", "ecdict"],
   "license": "MIT",
   "dependencies": {
     "dotenv": "^16.4.7",

@@ -1,7 +1,7 @@
 // ============================================================
 // 在线词典查询服务：Node.js + Express + MySQL (mysql2)
 // 低内存设计：仅依赖 express + mysql2 + dotenv，小连接池
-// 部署：Render 免费版 / 任意 Node 平台，数据库用免费 MySQL/TiDB
+// 数据源：CEDICT（拼音）/ ECDICT（音标、词性、标签、词形）
 // ============================================================
 require('dotenv').config();
 
@@ -65,14 +65,14 @@ app.get('/api/search', async (req, res) => {
     return res.status(400).json({ error: '缺少查询词，请提供 q 参数' });
   }
 
-  const cols = 'id, word, traditional, pinyin, definition, source';
+  const cols = 'id, word, traditional, pinyin, phonetic, definition, pos, tag, exchange, audio, source';
   let sql;
   let params;
   if (mode === 'exact') {
     sql = 'SELECT ' + cols + ' FROM entries WHERE word = ? ORDER BY word LIMIT ?';
     params = [q, limit];
   } else if (mode === 'fuzzy') {
-    sql = 'SELECT ' + cols + ' FROM entries WHERE word LIKE ? OR pinyin LIKE ? OR definition LIKE ? ORDER BY word LIMIT ?';
+    sql = 'SELECT ' + cols + ' FROM entries WHERE word LIKE ? OR phonetic LIKE ? OR definition LIKE ? ORDER BY word LIMIT ?';
     params = ['%' + q + '%', '%' + q + '%', '%' + q + '%', limit];
   } else {
     sql = 'SELECT ' + cols + ' FROM entries WHERE word LIKE ? ORDER BY word LIMIT ?';
