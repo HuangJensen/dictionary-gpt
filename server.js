@@ -98,7 +98,12 @@ app.use((err, req, res, next) => {
   res.status(500).json({ error: 'Internal Server Error' });
 });
 
-app.listen(PORT, '0.0.0.0', () => {
-  console.log('Dictionary API running at http://localhost:' + PORT);
-  console.log('Health check: http://localhost:' + PORT + '/health');
-});
+// 本地直接运行时才监听端口；部署到 Vercel 等平台时由平台调用 app
+if (require.main === module) {
+  app.listen(PORT, '0.0.0.0', () => {
+    console.log('Dictionary API running at http://localhost:' + PORT);
+    console.log('Health check: http://localhost:' + PORT + '/health');
+  });
+}
+
+module.exports = app;

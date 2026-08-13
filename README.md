@@ -193,6 +193,27 @@ n. 表示问候",
 - 导入 ECDICT 采用流式逐行读取 + 批量插入，内存占用稳定
 - 大词库查询建议用 exact / prefix（走索引），fuzzy 会全表扫描，较慢
 
+## 部署到 Vercel（无需信用卡，推荐国内用户）
+
+如果不想用 Render（部分地区会被要求绑信用卡验证），改用 Vercel 免费部署，**全程不需要银行卡**：
+
+1. 打开 https://vercel.com 用 **GitHub 账号**注册登录（免费，不绑卡）
+2. 点 **Add New → Project** → 选择 dictionary-gpt 仓库 → **Import**
+3. 在 **Environment Variables** 里填（和 .env 一样）：
+
+```
+DB_HOST=gateway01.ap-northeast-1.prod.aws.tidbcloud.com
+DB_PORT=4000
+DB_USER=2D1J24xtKs4xwp6.root
+DB_PASSWORD=你的TiDB密码
+DB_NAME=dictionary
+DB_SSL=true
+```
+
+4. 点 **Deploy**，等 1~2 分钟
+5. 完成后得到网址：https://dictionary-gpt.vercel.app（可自定义）
+
+> 项目已适配 Vercel：`api/index.js` 作为入口 + `vercel.json` 路由，前端页面和 API 都由同一个函数提供，无需额外配置。
 ## 数据来源与许可
 
 - ECDICT：https://github.com/skywind3000/ECDICT （MIT 协议，约 76 万词条）
