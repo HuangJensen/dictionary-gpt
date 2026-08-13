@@ -7,3 +7,6 @@ npm-debug.log*
 .env.cloud
 .dev.vars
 .wrangler/
+
+tunnel.log
+tools/
