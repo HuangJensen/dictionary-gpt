@@ -1,4 +1,4 @@
-// 纯静态词典查询：GitHub Pages + 浏览器本地搜索，无任何服务器
+// 纯静态词典查询（加速版）：按前两个字母分组 + jsDelivr CDN 优先，浏览器本地搜索
 (function () {
   'use strict';
   var form = document.getElementById('search-form');
@@ -9,22 +9,31 @@
   var cache = {};
   var timer = null;
 
+  // jsDelivr CDN 优先（国内较快），失败回退本站相对路径
+  var CDN = 'https://cdn.jsdelivr.net/gh/HuangJensen/dictionary-gpt@main/docs/static-data/';
+
   function esc(s) {
     var div = document.createElement('div');
     div.textContent = s == null ? '' : String(s);
     return div.innerHTML;
   }
 
-  function letterOf(q) {
-    var c = q.trim().charAt(0).toLowerCase();
-    return /^[a-z]$/.test(c) ? c : '0';
+  function chunkOf(q) {
+    var w = q.trim().toLowerCase();
+    var m = w.match(/^([a-z])([a-z])/);
+    if (m) return m[1] + m[2];
+    if (/^[a-z]$/.test(w.charAt(0))) return w.charAt(0) + '0';
+    return '00';
   }
 
-  function loadLetter(letter) {
-    if (cache[letter] !== undefined) return Promise.resolve(cache[letter]);
-    return fetch('static-data/' + letter + '.json.gz')
+  function loadChunk(key) {
+    if (cache[key] !== undefined) return Promise.resolve(cache[key]);
+    return fetch(CDN + key + '.json.gz')
       .then(function (res) {
-        if (!res.ok) throw new Error('数据加载失败 (' + res.status + ')');
+        if (!res.ok) return fetch('static-data/' + key + '.json.gz').then(function (r2) {
+          if (!r2.ok) throw new Error('数据加载失败 (' + r2.status + ')');
+          return r2.arrayBuffer();
+        });
         return res.arrayBuffer();
       })
       .then(function (buf) {
@@ -32,10 +41,7 @@
         var stream = new Blob([buf]).stream().pipeThrough(ds);
         return new Response(stream).json();
       })
-      .then(function (data) {
-        cache[letter] = data;
-        return data;
-      });
+      .then(function (data) { cache[key] = data; return data; });
   }
 
   function render(r) {
@@ -61,16 +67,17 @@
   function search() {
     var q = input.value.trim();
     if (!q) { resultsEl.innerHTML = ''; statusEl.textContent = ''; return; }
+    if (q.length < 2) { statusEl.textContent = '请输入至少 2 个字母'; resultsEl.innerHTML = ''; return; }
     statusEl.textContent = '加载中…';
     var m = mode.value;
-    var letter = letterOf(q);
-    loadLetter(letter).then(function (data) {
+    var key = chunkOf(q);
+    loadChunk(key).then(function (data) {
       var ql = q.toLowerCase();
       var out = [];
       var i;
       if (m === 'exact') {
         for (i = 0; i < data.length; i++) {
-          if (data[i].w.toLowerCase() === ql) { out.push(data[i]); if (out.length >= 30) break; }
+          if (data[i].w.toLowerCase() === ql) { out.push(data[i]); break; }
         }
       } else if (m === 'fuzzy') {
         for (i = 0; i < data.length; i++) {
@@ -103,7 +110,7 @@
   form.addEventListener('submit', function (e) { e.preventDefault(); search(); });
   input.addEventListener('input', function () {
     clearTimeout(timer);
-    timer = setTimeout(search, 250);
+    timer = setTimeout(search, 200);
   });
   mode.addEventListener('change', search);
 })();
