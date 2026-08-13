@@ -19,13 +19,8 @@
     return div.innerHTML;
   }
 
-  // 加载分组索引（决定用 2 字母还是 3 字母文件）
-  function loadIndex() {
-    if (keys) return Promise.resolve(keys);
-    return fetch('static-data/index.json')
-      .then(function (r) { if (!r.ok) throw new Error('索引加载失败'); return r.json(); })
-      .then(function (obj) { fnames = obj; keys = new Set(Object.keys(obj)); return keys; });
-  }
+  // 分组索引已内嵌在 keys.js（避免额外的网络请求）
+  keys = new Set(window.DICT_KEYS || []);
 
   // 根据查询选数据文件 key（优先更小的 3 字母分组）
   function keyFor(q, keys) {
@@ -86,9 +81,8 @@
     if (q.length < 2) { statusEl.textContent = '请输入至少 2 个字母'; resultsEl.innerHTML = ''; return; }
     statusEl.textContent = '加载中…';
     var m = mode.value;
-    loadIndex().then(function (keySet) {
-      var key = keyFor(q, keySet);
-      return loadChunk(key).then(function (data) {
+    var key = keyFor(q, keys);
+      loadChunk(key).then(function (data) {
         var ql = q.toLowerCase();
         var out = [];
         var i;
@@ -118,8 +112,7 @@
         }
         statusEl.textContent = '找到 ' + out.length + ' 条结果（本地搜索）';
         resultsEl.innerHTML = out.map(render).join('');
-      });
-    }).catch(function (err) {
+      }).catch(function (err) {
       statusEl.textContent = '出错了：' + err.message;
       resultsEl.innerHTML = '';
     });

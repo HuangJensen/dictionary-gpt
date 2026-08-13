@@ -89,6 +89,7 @@ async function main() {
     }
   }
   fs.writeFileSync(path.join(outDir, 'index.json'), JSON.stringify(allKeys));
+  fs.writeFileSync(path.join(outDir, 'keys.js'), 'window.DICT_KEYS=' + JSON.stringify(Object.keys(allKeys)) + ';');
   console.log(`完成：2字母组 ${Object.keys(g2).length} 个，拆分的组 ${bigCount} 个，3字母子文件已生成`);
   await conn.end();
 }
