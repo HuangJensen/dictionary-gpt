@@ -14,9 +14,17 @@
   "engines": {
     "node": ">=18"
   },
-  "keywords": ["dictionary", "mysql", "nodejs", "express", "free", "ecdict"],
+  "keywords": [
+    "dictionary",
+    "mysql",
+    "nodejs",
+    "express",
+    "free",
+    "ecdict"
+  ],
   "license": "MIT",
   "dependencies": {
+    "@tidbcloud/serverless": "^0.3.0",
     "dotenv": "^16.4.7",
     "express": "^4.21.2",
     "mysql2": "^3.12.0"

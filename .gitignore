@@ -5,3 +5,4 @@ npm-debug.log*
 .DS_Store
 *.local
 .env.cloud
+.dev.vars

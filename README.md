@@ -214,6 +214,29 @@ DB_SSL=true
 5. 完成后得到网址：https://dictionary-gpt.vercel.app（可自定义）
 
 > 项目已适配 Vercel：`api/index.js` 作为入口 + `vercel.json` 路由，前端页面和 API 都由同一个函数提供，无需额外配置。
+## 部署到 Cloudflare Pages（国内可访问、无需信用卡，推荐）
+
+如果 Vercel（vercel.app）在你的网络无法访问（超时/被屏蔽），改用 **Cloudflare Pages** —— `pages.dev` 在国内通常可达，且免费、**不绑卡**。项目已用 TiDB 官方 HTTPS 驱动（`@tidbcloud/serverless`）适配，无需原始 TCP 端口。
+
+1. 打开 https://dash.cloudflare.com 注册（免费，可用手机号验证，不绑卡）
+2. 左侧菜单 **Workers 和 Pages** → **Create（创建）** → **Pages** → **Connect to Git（连接到 Git）**
+3. 授权 GitHub → 选择 **dictionary-gpt** 仓库
+4. 构建配置保持默认（Cloudflare 会自动安装依赖并识别 `functions/` 目录）
+5. 在 **Settings → Environment variables** 添加 6 个变量：
+
+```
+DB_HOST=gateway01.ap-northeast-1.prod.aws.tidbcloud.com
+DB_PORT=4000
+DB_USER=2D1J24xtKs4xwp6.root
+DB_PASSWORD=你的TiDB密码
+DB_NAME=dictionary
+DB_SSL=true
+```
+
+6. 点 **Save and Deploy（保存并部署）**，等 1~2 分钟
+7. 得到网址：https://dictionary-gpt.pages.dev（可自定义）
+
+> 说明：`functions/api/search.js` 提供查询接口、`functions/health.js` 健康检查、`public/` 自动作为静态站点；全部走 HTTPS 驱动连接 TiDB，国内网络可正常访问。
 ## 数据来源与许可
 
 - ECDICT：https://github.com/skywind3000/ECDICT （MIT 协议，约 76 万词条）
