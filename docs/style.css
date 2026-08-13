@@ -29,3 +29,5 @@ h1 { font-size: 28px; text-align: center; }
   .search-box select { order: 3; flex: 1; padding: 10px; }
   .search-box button { flex: 1; }
 }
+
+.footer { text-align: center; margin-top: 40px; padding-bottom: 20px; color: #9ca3af; font-size: 13px; }
