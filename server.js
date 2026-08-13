@@ -6,6 +6,7 @@
 require('dotenv').config();
 
 const express = require('express');
+const fs = require('fs');
 const path = require('path');
 const mysql = require('mysql2/promise');
 
@@ -32,7 +33,11 @@ pool.on('error', (err) => {
 
 const app = express();
 app.disable('x-powered-by');
-app.use(express.static(path.join(__dirname, 'public')));
+// 静态目录：兼容本地与 Vercel 等平台的不同工作目录
+const publicDir = fs.existsSync(path.join(__dirname, 'public'))
+  ? path.join(__dirname, 'public')
+  : path.join(process.cwd(), 'public');
+app.use(express.static(publicDir));
 
 // 跨域：前端可部署在 GitHub Pages / Vercel 等任意位置
 app.use((req, res, next) => {
