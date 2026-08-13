@@ -6,3 +6,4 @@ npm-debug.log*
 *.local
 .env.cloud
 .dev.vars
+.wrangler/
