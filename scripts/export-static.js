@@ -1,4 +1,4 @@
-﻿// 导出词典数据为按首字母分组的 gzip JSON（供 GitHub Pages 静态部署）
+// 导出词典数据为按首字母分组的 gzip JSON（供 GitHub Pages 静态部署）
 // 用法: node scripts/export-static.js
 const mysql = require('mysql2/promise');
 const fs = require('fs');
@@ -38,7 +38,7 @@ async function main() {
     groups[key].push(e);
   });
 
-  const outDir = path.join(__dirname, '..', 'site', 'static-data');
+  const outDir = path.join(__dirname, '..', 'docs', 'static-data');
   fs.mkdirSync(outDir, { recursive: true });
 
   let totalRaw = 0;

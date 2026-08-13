@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>在线词典查询（GitHub Pages）</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <main class="container">
+    <h1>📖 在线词典查询</h1>
+    <p class="subtitle">纯静态 · GitHub Pages 托管 · 76 万词条（ECDICT）· 浏览器本地搜索</p>
+
+    <form id="search-form" class="search-box">
+      <input id="q" type="text" placeholder="输入要查询的单词，例如 hello" autocomplete="off" autofocus />
+      <select id="mode" title="匹配方式">
+        <option value="prefix" selected>前缀匹配</option>
+        <option value="exact">精确匹配</option>
+        <option value="fuzzy">模糊搜索</option>
+      </select>
+      <button type="submit">查询</button>
+    </form>
+
+    <p id="status" class="status" role="status"></p>
+    <ul id="results" class="results"></ul>
+  </main>
+  <script src="app.js"></script>
+</body>
+</html>
