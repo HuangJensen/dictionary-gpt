@@ -68,7 +68,18 @@ body {
 }
 .topbar.compact { padding: 8px 20px; box-shadow: 0 4px 16px var(--shadow); border-bottom-color: var(--btn-border); }
 .brand-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 8px; }
+.brand-left { display: flex; align-items: center; gap: 10px; min-width: 0; }
 .brand-actions { display: flex; align-items: center; gap: 8px; }
+.cross-link {
+  display: inline-flex; align-items: center; white-space: nowrap;
+  background: var(--card-bg); color: var(--text);
+  border: 1px solid var(--btn-border); border-radius: 999px;
+  padding: 6px 14px; font-size: 13px; text-decoration: none;
+  box-shadow: 0 2px 8px var(--shadow);
+  transition: all .18s ease;
+}
+.cross-link:hover { border-color: var(--btn-bg); color: var(--btn-bg); transform: translateY(-1px); }
+.topbar.compact .cross-link { padding: 4px 10px; font-size: 12px; }
 .brand { font-size: 24px; white-space: nowrap; transition: font-size .25s ease; }
 .topbar.compact .brand { font-size: 17px; }
 
