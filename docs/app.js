@@ -1,4 +1,4 @@
-// 纯静态词典查询（加速版 v3）：2/3字母分组自动选择 + 同源优先 + CDN 回退
+// 纯静态词典查询：2/3字母分组 + 主题切换 + 顶部固定/滚动缩小 + 回到顶部
 (function () {
   'use strict';
   var form = document.getElementById('search-form');
@@ -7,8 +7,8 @@
   var statusEl = document.getElementById('status');
   var resultsEl = document.getElementById('results');
   var cache = {};
-  var keys = null; // 所有数据分组的 key 集合
-  var fnames = null; // key -> 实际文件名（避免 Windows 保留名）
+  var keys = null;
+  var fnames = null;
   var timer = null;
 
   var CDN = 'https://cdn.jsdelivr.net/gh/HuangJensen/dictionary-gpt@main/docs/static-data/';
@@ -19,10 +19,9 @@
     return div.innerHTML;
   }
 
-  // 分组索引已内嵌在 keys.js（避免额外的网络请求）
+  // 分组索引已内嵌在 keys.js
   keys = new Set(window.DICT_KEYS || []);
 
-  // 根据查询选数据文件 key（优先更小的 3 字母分组）
   function keyFor(q, keys) {
     var w = q.trim().toLowerCase();
     var m3 = w.match(/^([a-z])([a-z])([a-z])/);
@@ -36,7 +35,6 @@
   function loadChunk(key) {
     if (cache[key] !== undefined) return Promise.resolve(cache[key]);
     var fname = (fnames && fnames[key]) || key;
-    // 同源优先（实测最快），失败回退 CDN
     return fetch('static-data/' + fname + '.json.gz')
       .then(function (res) {
         if (!res.ok) {
@@ -82,37 +80,37 @@
     statusEl.textContent = '加载中…';
     var m = mode.value;
     var key = keyFor(q, keys);
-      loadChunk(key).then(function (data) {
-        var ql = q.toLowerCase();
-        var out = [];
-        var i;
-        if (m === 'exact') {
-          for (i = 0; i < data.length; i++) {
-            if (data[i].w.toLowerCase() === ql) { out.push(data[i]); break; }
-          }
-        } else if (m === 'fuzzy') {
-          for (i = 0; i < data.length; i++) {
-            var e = data[i];
-            if (e.w.toLowerCase().indexOf(ql) >= 0 ||
-                (e.d && e.d.toLowerCase().indexOf(ql) >= 0) ||
-                (e.py && e.py.toLowerCase().indexOf(ql) >= 0)) {
-              out.push(e);
-              if (out.length >= 30) break;
-            }
-          }
-        } else {
-          for (i = 0; i < data.length; i++) {
-            if (data[i].w.toLowerCase().indexOf(ql) === 0) { out.push(data[i]); if (out.length >= 30) break; }
+    loadChunk(key).then(function (data) {
+      var ql = q.toLowerCase();
+      var out = [];
+      var i;
+      if (m === 'exact') {
+        for (i = 0; i < data.length; i++) {
+          if (data[i].w.toLowerCase() === ql) { out.push(data[i]); break; }
+        }
+      } else if (m === 'fuzzy') {
+        for (i = 0; i < data.length; i++) {
+          var e = data[i];
+          if (e.w.toLowerCase().indexOf(ql) >= 0 ||
+              (e.d && e.d.toLowerCase().indexOf(ql) >= 0) ||
+              (e.py && e.py.toLowerCase().indexOf(ql) >= 0)) {
+            out.push(e);
+            if (out.length >= 30) break;
           }
         }
-        if (out.length === 0) {
-          statusEl.textContent = '未找到 “' + q + '” 的相关结果';
-          resultsEl.innerHTML = '';
-          return;
+      } else {
+        for (i = 0; i < data.length; i++) {
+          if (data[i].w.toLowerCase().indexOf(ql) === 0) { out.push(data[i]); if (out.length >= 30) break; }
         }
-        statusEl.textContent = '找到 ' + out.length + ' 条结果（本地搜索）';
-        resultsEl.innerHTML = out.map(render).join('');
-      }).catch(function (err) {
+      }
+      if (out.length === 0) {
+        statusEl.textContent = '未找到 “' + q + '” 的相关结果';
+        resultsEl.innerHTML = '';
+        return;
+      }
+      statusEl.textContent = '找到 ' + out.length + ' 条结果（本地搜索）';
+      resultsEl.innerHTML = out.map(render).join('');
+    }).catch(function (err) {
       statusEl.textContent = '出错了：' + err.message;
       resultsEl.innerHTML = '';
     });
@@ -124,4 +122,53 @@
     timer = setTimeout(search, 200);
   });
   mode.addEventListener('change', search);
+
+  // ===== 顶部固定 + 滚动缩小 + 回到顶部 =====
+  var topbar = document.getElementById('topbar');
+  var backtop = document.getElementById('backtop');
+  function onScroll() {
+    var y = window.scrollY || document.documentElement.scrollTop || 0;
+    if (topbar) topbar.classList.toggle('compact', y > 40);
+    if (backtop) backtop.classList.toggle('show', y > 200);
+  }
+  window.addEventListener('scroll', onScroll, { passive: true });
+  onScroll();
+  if (backtop) {
+    backtop.addEventListener('click', function () {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+  }
+
+  // ===== 主题切换（下拉 + 记住选择）=====
+  var THEMES = ['white', 'black', 'green', 'gray'];
+  var LABELS = { white: '白', black: '黑', green: '护眼绿（白天）', gray: '护眼灰（黑夜）' };
+  var DOTS = { white: '#f0f4ff', black: '#141414', green: '#c7edcc', gray: '#3b3a38' };
+  function applyTheme(t) {
+    document.body.setAttribute('data-theme', t);
+    var lab = document.getElementById('theme-label');
+    var dot = document.getElementById('theme-dot');
+    if (lab) lab.textContent = LABELS[t] || t;
+    if (dot) dot.style.background = DOTS[t] || '#fff';
+    try { localStorage.setItem('dict-theme', t); } catch (e) {}
+  }
+  var saved = null;
+  try { saved = localStorage.getItem('dict-theme'); } catch (e) {}
+  if (THEMES.indexOf(saved) < 0) saved = 'white';
+  applyTheme(saved);
+
+  var trigger = document.getElementById('theme-trigger');
+  var menu = document.getElementById('theme-menu');
+  function closeMenu() { if (menu) menu.classList.remove('open'); }
+  if (trigger && menu) {
+    trigger.addEventListener('click', function (ev) {
+      ev.stopPropagation();
+      menu.classList.toggle('open');
+      trigger.setAttribute('aria-expanded', menu.classList.contains('open') ? 'true' : 'false');
+    });
+    menu.addEventListener('click', function (ev) {
+      var o = ev.target && ev.target.closest ? ev.target.closest('.theme-option') : null;
+      if (o) { applyTheme(o.getAttribute('data-theme')); closeMenu(); }
+    });
+    document.addEventListener('click', closeMenu);
+  }
 })();
