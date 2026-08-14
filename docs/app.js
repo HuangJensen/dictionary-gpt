@@ -183,6 +183,8 @@
   var affixBacktop = document.getElementById('affix-backtop');
   var affixSort = document.getElementById('affix-sort');
   var affixesLoaded = false;
+  var sortedFreq = null;
+  var sortedAlpha = null;
 
   function loadAffixes() {
     if (affixesLoaded) return Promise.resolve(window.DICT_AFFIXES || []);
@@ -195,31 +197,33 @@
     });
   }
 
-  function sortAffixes(list) {
-    var mode = affixSort ? affixSort.value : 'freq';
-    return list.slice().sort(function (a, b) {
-      if (mode === 'alpha') {
-        var x = a.a.toLowerCase(), y = b.a.toLowerCase();
-        return x < y ? -1 : x > y ? 1 : 0;
-      }
-      var fa = a.f || 3, fb = b.f || 3;
-      if (fa !== fb) return fa - fb;
-      var x = a.a.toLowerCase(), y = b.a.toLowerCase();
-      return x < y ? -1 : x > y ? 1 : 0;
-    });
+  function alphaCmp(a, b) {
+    var x = a.a.toLowerCase(), y = b.a.toLowerCase();
+    return x < y ? -1 : x > y ? 1 : 0;
   }
-
+  function freqCmp(a, b) {
+    var fa = a.f || 3, fb = b.f || 3;
+    if (fa !== fb) return fa - fb;
+    return alphaCmp(a, b);
+  }
+  function prepareSorted(AFFIXES) {
+    if (sortedFreq) return;
+    sortedFreq = AFFIXES.slice().sort(freqCmp);
+    sortedAlpha = AFFIXES.slice().sort(alphaCmp);
+  }
   function renderAffixes(q) {
     loadAffixes().then(function (AFFIXES) {
       if (affixCount) affixCount.textContent = '共 ' + AFFIXES.length + ' 条';
+      prepareSorted(AFFIXES);
       var ql = (q || '').trim().toLowerCase();
-      var list = AFFIXES.filter(function (x) {
+      var base = (affixSort && affixSort.value === 'alpha') ? sortedAlpha : sortedFreq;
+      var list = base.filter(function (x) {
         if (!ql) return true;
         return x.a.toLowerCase().indexOf(ql) >= 0 || x.m.indexOf(ql) >= 0;
       });
       var html = '';
       ['前缀', '后缀'].forEach(function (t) {
-        var items = sortAffixes(list.filter(function (x) { return x.t === t; }));
+        var items = list.filter(function (x) { return x.t === t; });
         if (!items.length) return;
         html += '<div class="affix-type">' + t + '（' + items.length + '）</div>';
         items.forEach(function (x) {

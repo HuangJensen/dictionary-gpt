@@ -190,12 +190,13 @@ body {
   border-radius: 999px; padding: 4px 10px; font-size: 12px; cursor: pointer; outline: none;
 }
 .affix-hot {
-  display: inline-block; background: #fef3c7; color: #b45309; border: 1px solid #fcd34d;
+  display: inline-block; background: #d8efe0; color: #3e6b4a; border: 1px solid #b8dcc6;
   border-radius: 999px; padding: 0 7px; font-size: 10px; margin-right: 6px; vertical-align: 1px;
 }
-body[data-theme="black"] .affix-hot { background: #78350f; color: #fcd34d; border-color: #b45309; }
-body[data-theme="green"] .affix-hot { background: #fef3c7; color: #8a5a00; border-color: #fcd34d; }
-body[data-theme="gray"] .affix-hot { background: #57534e; color: #fde68a; border-color: #78716c; }
+body[data-theme="black"] .affix-hot { background: #1f3a2a; color: #9fd0b0; border-color: #2f5a3e; }
+body[data-theme="green"] .affix-hot { background: #cde8d4; color: #336048; border-color: #a8d0b2; }
+body[data-theme="gray"] .affix-hot { background: #3c4c42; color: #a9cbb2; border-color: #4d6254; }
+.affix-list { contain: layout paint style; }
 .affix-close {
   width: 30px; height: 30px; border-radius: 50%; border: none;
   background: var(--input-bg); color: var(--sub); font-size: 15px; cursor: pointer;
