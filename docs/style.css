@@ -138,6 +138,41 @@ body {
 .backtop.show { opacity: 1; transform: translateY(0); }
 .backtop:hover { background: var(--btn-hover); }
 
+
+/* ===== 顶部按钮区 ===== */
+.brand-actions { display: flex; align-items: center; gap: 8px; }
+.affix-btn {
+  display: inline-flex; align-items: center; gap: 6px;
+  background: var(--card-bg); color: var(--text);
+  border: 1px solid var(--btn-border); border-radius: 999px;
+  padding: 5px 12px; font-size: 13px; cursor: pointer;
+  box-shadow: 0 2px 8px var(--shadow);
+}
+.affix-btn:hover { opacity: .95; }
+
+/* ===== 词缀面板（弹窗）===== */
+.affix-panel {
+  position: fixed; left: 50%; top: 50%; transform: translate(-50%, -50%);
+  width: min(560px, 92vw); max-height: 74vh;
+  display: none; flex-direction: column;
+  background: var(--card-bg); border: 1px solid var(--btn-border); border-radius: 16px;
+  box-shadow: 0 20px 60px var(--shadow); z-index: 60;
+}
+.affix-panel.open { display: flex; }
+.affix-head { display: flex; justify-content: space-between; align-items: center; padding: 14px 16px 8px; font-size: 15px; color: var(--text); }
+.affix-close { border: none; background: transparent; color: var(--sub); font-size: 17px; cursor: pointer; padding: 2px 6px; }
+.affix-panel input { margin: 0 16px 10px; padding: 9px 12px; border: 1px solid var(--btn-border); border-radius: 10px; background: var(--input-bg); color: var(--input-text); font-size: 14px; outline: none; }
+.affix-list { overflow-y: auto; padding: 0 16px 16px; }
+.affix-type { font-weight: 700; font-size: 13px; color: var(--sub); margin: 10px 0 6px; }
+.affix-item { background: var(--input-bg); border-radius: 10px; padding: 9px 12px; margin-bottom: 8px; }
+.affix-name { font-weight: 700; color: var(--phonetic); }
+.affix-mean { color: var(--text); margin-left: 8px; font-size: 13px; }
+.affix-ex { color: var(--sub); font-size: 12px; margin-top: 3px; }
+.affix-empty { color: var(--sub); text-align: center; padding: 20px; font-size: 13px; }
+
+/* ===== 页脚（JasonHuang 出品，合适大小）===== */
+.footer { text-align: center; margin-top: 40px; padding-bottom: 26px; color: var(--meta); font-size: 14px; letter-spacing: 1px; }
+
 @media (max-width: 520px) {
   .search-box { flex-wrap: wrap; }
   .search-box select { order: 3; flex: 1; padding: 10px; }

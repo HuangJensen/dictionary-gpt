@@ -9,18 +9,21 @@
 <body data-theme="white">
   <header class="topbar" id="topbar">
     <div class="brand-row">
-      <h1 class="brand">📖 在线词典查询</h1>
-      <div class="theme-picker" id="theme-picker">
-        <button type="button" class="theme-trigger" id="theme-trigger" aria-haspopup="listbox" aria-expanded="false">
-          <span class="theme-dot" id="theme-dot"></span>
-          <span id="theme-label">白</span>
-          <span class="theme-arrow">▾</span>
-        </button>
-        <div class="theme-menu" id="theme-menu" role="listbox">
-          <button type="button" class="theme-option" data-theme="white"><span class="dot dot-white"></span>白</button>
-          <button type="button" class="theme-option" data-theme="black"><span class="dot dot-black"></span>黑</button>
-          <button type="button" class="theme-option" data-theme="green"><span class="dot dot-green"></span>护眼绿（白天）</button>
-          <button type="button" class="theme-option" data-theme="gray"><span class="dot dot-gray"></span>护眼灰（黑夜）</button>
+      <h1 class="brand">📖 在线词典</h1>
+      <div class="brand-actions">
+        <button type="button" class="affix-btn" id="affix-btn">🔤 词缀</button>
+        <div class="theme-picker" id="theme-picker">
+          <button type="button" class="theme-trigger" id="theme-trigger" aria-haspopup="listbox" aria-expanded="false">
+            <span class="theme-dot" id="theme-dot"></span>
+            <span id="theme-label">白</span>
+            <span class="theme-arrow">▾</span>
+          </button>
+          <div class="theme-menu" id="theme-menu" role="listbox">
+            <button type="button" class="theme-option" data-theme="white"><span class="dot dot-white"></span>白</button>
+            <button type="button" class="theme-option" data-theme="black"><span class="dot dot-black"></span>黑</button>
+            <button type="button" class="theme-option" data-theme="green"><span class="dot dot-green"></span>护眼绿（白天）</button>
+            <button type="button" class="theme-option" data-theme="gray"><span class="dot dot-gray"></span>护眼灰（黑夜）</button>
+          </div>
         </div>
       </div>
     </div>
@@ -43,6 +46,15 @@
 
   <footer class="footer">JasonHuang 出品</footer>
   <button type="button" id="backtop" class="backtop" title="回到顶部">↑</button>
+
+  <div class="affix-panel" id="affix-panel">
+    <div class="affix-head">
+      <strong>🔤 词缀查询</strong>
+      <button type="button" class="affix-close" id="affix-close" title="关闭">✕</button>
+    </div>
+    <input id="affix-q" type="text" placeholder="输入词缀，如 un- / -tion / 不…" autocomplete="off" />
+    <div class="affix-list" id="affix-list"></div>
+  </div>
 
   <script src="static-data/keys.js"></script>
   <script src="app.js"></script>
