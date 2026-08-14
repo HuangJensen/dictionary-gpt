@@ -1,4 +1,4 @@
-// 纯静态词典查询：2/3字母分组 + 主题切换 + 顶部固定/滚动缩小 + 回到顶部 + 词缀库子页面
+// 纯静态词典查询：2/3字母分组 + 主题切换 + 顶部固定/滚动缩小 + 回到顶部 + 词缀库抽屉
 (function () {
   'use strict';
   var form = document.getElementById('search-form');
@@ -171,7 +171,7 @@
     document.addEventListener('click', closeMenu);
   }
 
-  // ===== 词缀库子页面 =====
+  // ===== 词缀库抽屉（靠右 70%，懒加载）=====
   var affixBtn = document.getElementById('affix-btn');
   var affixPage = document.getElementById('affix-page');
   var affixInner = document.getElementById('affix-inner');
@@ -181,6 +181,7 @@
   var affixCount = document.getElementById('affix-count');
   var affixClose = document.getElementById('affix-close');
   var affixBacktop = document.getElementById('affix-backtop');
+  var affixSort = document.getElementById('affix-sort');
   var affixesLoaded = false;
 
   function loadAffixes() {
@@ -194,6 +195,20 @@
     });
   }
 
+  function sortAffixes(list) {
+    var mode = affixSort ? affixSort.value : 'freq';
+    return list.slice().sort(function (a, b) {
+      if (mode === 'alpha') {
+        var x = a.a.toLowerCase(), y = b.a.toLowerCase();
+        return x < y ? -1 : x > y ? 1 : 0;
+      }
+      var fa = a.f || 3, fb = b.f || 3;
+      if (fa !== fb) return fa - fb;
+      var x = a.a.toLowerCase(), y = b.a.toLowerCase();
+      return x < y ? -1 : x > y ? 1 : 0;
+    });
+  }
+
   function renderAffixes(q) {
     loadAffixes().then(function (AFFIXES) {
       if (affixCount) affixCount.textContent = '共 ' + AFFIXES.length + ' 条';
@@ -204,11 +219,12 @@
       });
       var html = '';
       ['前缀', '后缀'].forEach(function (t) {
-        var items = list.filter(function (x) { return x.t === t; });
+        var items = sortAffixes(list.filter(function (x) { return x.t === t; }));
         if (!items.length) return;
         html += '<div class="affix-type">' + t + '（' + items.length + '）</div>';
         items.forEach(function (x) {
-          html += '<div class="affix-item"><span class="affix-name">' + esc(x.a) + '</span><span class="affix-mean">' + esc(x.m) + '</span><div class="affix-ex">' + esc(x.e) + '</div></div>';
+          var hot = x.f === 1 ? '<span class="affix-hot">高频</span>' : '';
+          html += '<div class="affix-item">' + hot + '<span class="affix-name">' + esc(x.a) + '</span><span class="affix-mean">' + esc(x.m) + '</span><div class="affix-ex">' + esc(x.e) + '</div></div>';
         });
       });
       affixList.innerHTML = html || '<div class="affix-empty">未找到相关词缀</div>';
@@ -237,8 +253,9 @@
       if (ev.key === 'Escape') closeAffix();
     });
     if (affixQ) affixQ.addEventListener('input', function () { renderAffixes(affixQ.value); });
+    if (affixSort) affixSort.addEventListener('change', function () { renderAffixes(affixQ.value); });
 
-    // 子页面：搜索条固定 + 滚动缩小 + 回到顶部
+    // 抽屉内部：搜索条固定 + 滚动缩小 + 回到顶部
     function onAffixScroll() {
       var y = affixInner ? affixInner.scrollTop : 0;
       if (affixTop) affixTop.classList.toggle('compact', y > 40);

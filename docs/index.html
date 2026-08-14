@@ -9,12 +9,11 @@
 <body data-theme="white">
   <header class="topbar" id="topbar">
     <div class="brand-row">
-      <div class="brand-left">
-        <h1 class="brand">📖 在线词典</h1>
+      <h1 class="brand">📖 在线词典</h1>
+      <div class="brand-actions">
         <button type="button" class="affix-btn" id="affix-btn">
           <span class="affix-ico">🧩</span>词缀库
         </button>
-      </div>
       <div class="theme-picker" id="theme-picker">
         <button type="button" class="theme-trigger" id="theme-trigger" aria-haspopup="listbox" aria-expanded="false">
           <span class="theme-dot" id="theme-dot"></span>
@@ -27,6 +26,7 @@
           <button type="button" class="theme-option" data-theme="green"><span class="dot dot-green"></span>护眼绿（白天）</button>
           <button type="button" class="theme-option" data-theme="gray"><span class="dot dot-gray"></span>护眼灰（黑夜）</button>
         </div>
+      </div>
       </div>
     </div>
     <p class="subtitle">纯静态 · 76 万词条（ECDICT）· 浏览器本地搜索</p>
@@ -55,7 +55,13 @@
       <header class="affix-top" id="affix-top">
         <div class="affix-top-row">
           <h2 class="affix-title">🧩 词缀库 <span class="affix-count" id="affix-count"></span></h2>
-          <button type="button" class="affix-close" id="affix-close" title="关闭">✕</button>
+          <div class="affix-tools">
+            <select id="affix-sort" class="affix-sort" title="排序方式">
+              <option value="freq">按频率</option>
+              <option value="alpha">按首字母</option>
+            </select>
+            <button type="button" class="affix-close" id="affix-close" title="关闭">✕</button>
+          </div>
         </div>
         <input id="affix-q" type="text" placeholder="输入词缀，如 un- / -tion / 不…" autocomplete="off" />
       </header>
