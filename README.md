@@ -2,10 +2,22 @@
 
 一个轻量级的在线词典查询应用，技术栈：**JavaScript + Node.js + MySQL + GitHub**。
 
-- ✅ **免费**：数据库用 TiDB Cloud Serverless（MySQL 兼容、免信用卡），部署用 Render 免费版
-- ✅ **内存小**：只依赖 3 个运行时包（express / mysql2 / dotenv），小连接池，默认堆内存上限 256MB
-- ✅ **可互联网访问**：部署到 Render / Vercel 后，任何人通过 URL 即可访问
-- ✅ **词库大**：默认内置 ECDICT 英汉词典（约 76 万词条，MIT 协议），含音标、词性、考试标签、词形变化
+- ✅ **免费**：Cloudflare Pages / GitHub Pages 静态托管，无需服务器、无需信用卡
+- ✅ **不需要自己的电脑**：网页和数据都在云端，电脑只用来访问
+- ✅ **可互联网访问**：主站 https://dictionary-gpt.pages.dev （Cloudflare，国内快）
+- ✅ **词库大**：内置 ECDICT 英汉词典 76 万词条（MIT 协议），含音标、词性、考试标签、词形变化
+- ✅ **纯静态零服务器**：76 万词条导出为 gzip 分组数据，浏览器本地搜索
+
+## 当前线上版本（已部署，可直接使用）
+
+| 版本 | 网址 | 说明 |
+| --- | --- | --- |
+| **主站（Cloudflare Pages）** | https://dictionary-gpt.pages.dev | 国内访问快，推荐 |
+| 备份（GitHub Pages） | https://huangjensen.github.io/dictionary-gpt/ | 备用 |
+
+- 查询方式：输入单词 → 精确 / 前缀 / 模糊三种模式，浏览器本地搜索
+- 更新词库：修改数据后运行 `node scripts/export-static.js` 重新导出，再 `wrangler pages deploy docs --project-name dictionary-gpt`
+- 部署到 Cloudflare：`CLOUDFLARE_API_TOKEN=xxx CLOUDFLARE_ACCOUNT_ID=xxx npx wrangler pages deploy docs --project-name dictionary-gpt`
 
 ## 功能
 
@@ -26,7 +38,12 @@
 │   └── seed.js            # 示例 CSV 导入脚本
 ├── scripts/
 │   ├── import-cedict.js   # 导入 CC-CEDICT（约 12 万词条，拼音）
-│   └── import-ecdict.js   # 导入 ECDICT（约 76 万词条，音标/词性/标签）
+│   ├── import-ecdict.js   # 导入 ECDICT（约 76 万词条，音标/词性/标签）
+│   └── export-static.js   # 导出 76 万词条为 gzip 分组数据（docs/static-data）
+├── docs/                  # 静态词典站（Cloudflare/GitHub Pages 部署源）
+│   ├── index.html         # 网页
+│   ├── app.js             # 浏览器本地搜索逻辑
+│   └── static-data/       # gzip 分组数据 + keys.js
 ├── data/                  # 词库文件（git 已忽略，不提交）
 ├── .env.example           # 环境变量模板
 ├── .github/workflows/     # CI：语法检查
