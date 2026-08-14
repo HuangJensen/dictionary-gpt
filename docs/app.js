@@ -1,4 +1,4 @@
-// 纯静态词典查询：2/3字母分组 + 主题切换 + 顶部固定/滚动缩小 + 回到顶部
+// 纯静态词典查询：2/3字母分组 + 主题切换 + 顶部固定/滚动缩小 + 回到顶部 + 词缀库子页面
 (function () {
   'use strict';
   var form = document.getElementById('search-form');
@@ -19,7 +19,6 @@
     return div.innerHTML;
   }
 
-  // 分组索引已内嵌在 keys.js
   keys = new Set(window.DICT_KEYS || []);
 
   function keyFor(q, keys) {
@@ -123,7 +122,7 @@
   });
   mode.addEventListener('change', search);
 
-  // ===== 顶部固定 + 滚动缩小 + 回到顶部 =====
+  // ===== 主页面：顶部固定 + 滚动缩小 + 回到顶部 =====
   var topbar = document.getElementById('topbar');
   var backtop = document.getElementById('backtop');
   function onScroll() {
@@ -139,7 +138,7 @@
     });
   }
 
-  // ===== 主题切换（下拉 + 记住选择）=====
+  // ===== 主题切换 =====
   var THEMES = ['white', 'black', 'green', 'gray'];
   var LABELS = { white: '白', black: '黑', green: '护眼绿（白天）', gray: '护眼灰（黑夜）' };
   var DOTS = { white: '#f0f4ff', black: '#141414', green: '#c7edcc', gray: '#3b3a38' };
@@ -172,8 +171,18 @@
     document.addEventListener('click', closeMenu);
   }
 
-  // ===== 词缀库（前缀 / 后缀，懒加载：点击按钮才加载）=====
+  // ===== 词缀库子页面 =====
+  var affixBtn = document.getElementById('affix-btn');
+  var affixPage = document.getElementById('affix-page');
+  var affixInner = document.getElementById('affix-inner');
+  var affixTop = document.getElementById('affix-top');
+  var affixQ = document.getElementById('affix-q');
+  var affixList = document.getElementById('affix-list');
+  var affixCount = document.getElementById('affix-count');
+  var affixClose = document.getElementById('affix-close');
+  var affixBacktop = document.getElementById('affix-backtop');
   var affixesLoaded = false;
+
   function loadAffixes() {
     if (affixesLoaded) return Promise.resolve(window.DICT_AFFIXES || []);
     return new Promise(function (resolve, reject) {
@@ -184,8 +193,10 @@
       document.head.appendChild(s);
     });
   }
+
   function renderAffixes(q) {
     loadAffixes().then(function (AFFIXES) {
+      if (affixCount) affixCount.textContent = '共 ' + AFFIXES.length + ' 条';
       var ql = (q || '').trim().toLowerCase();
       var list = AFFIXES.filter(function (x) {
         if (!ql) return true;
@@ -201,25 +212,43 @@
         });
       });
       affixList.innerHTML = html || '<div class="affix-empty">未找到相关词缀</div>';
+      if (affixInner) affixInner.scrollTop = 0;
     }).catch(function (err) {
       affixList.innerHTML = '<div class="affix-empty">' + esc(err.message) + '</div>';
     });
   }
 
-  var affixBtn = document.getElementById('affix-btn');
-  var affixPanel = document.getElementById('affix-panel');
-  var affixQ = document.getElementById('affix-q');
-  var affixList = document.getElementById('affix-list');
-  var affixClose = document.getElementById('affix-close');
-  if (affixBtn && affixPanel) {
-    affixBtn.addEventListener('click', function (ev) {
-      ev.stopPropagation();
-      var open = affixPanel.classList.toggle('open');
-      if (open) { renderAffixes(affixQ.value); affixQ.focus(); }
+  if (affixBtn && affixPage) {
+    affixBtn.addEventListener('click', function () {
+      affixPage.classList.add('open');
+      document.body.style.overflow = 'hidden';
+      renderAffixes(affixQ.value);
+      setTimeout(function () { if (affixQ) affixQ.focus(); }, 60);
     });
-    affixPanel.addEventListener('click', function (ev) { ev.stopPropagation(); });
-    if (affixClose) affixClose.addEventListener('click', function () { affixPanel.classList.remove('open'); });
+    function closeAffix() {
+      affixPage.classList.remove('open');
+      document.body.style.overflow = '';
+    }
+    if (affixClose) affixClose.addEventListener('click', closeAffix);
+    affixPage.addEventListener('click', function (ev) {
+      if (ev.target === affixPage) closeAffix();
+    });
+    document.addEventListener('keydown', function (ev) {
+      if (ev.key === 'Escape') closeAffix();
+    });
     if (affixQ) affixQ.addEventListener('input', function () { renderAffixes(affixQ.value); });
-    document.addEventListener('click', function () { affixPanel.classList.remove('open'); });
+
+    // 子页面：搜索条固定 + 滚动缩小 + 回到顶部
+    function onAffixScroll() {
+      var y = affixInner ? affixInner.scrollTop : 0;
+      if (affixTop) affixTop.classList.toggle('compact', y > 40);
+      if (affixBacktop) affixBacktop.classList.toggle('show', y > 200);
+    }
+    if (affixInner) affixInner.addEventListener('scroll', onAffixScroll, { passive: true });
+    if (affixBacktop) {
+      affixBacktop.addEventListener('click', function () {
+        if (affixInner) affixInner.scrollTo({ top: 0, behavior: 'smooth' });
+      });
+    }
   }
 })();
